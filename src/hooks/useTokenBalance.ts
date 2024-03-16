@@ -3,7 +3,7 @@ import { getTokenContract } from "../constants/contracts";
 import { readOnlyProvider } from "../constants/providers";
 import { useWeb3ModalAccount } from "@web3modal/ethers/react";
 
-const useTokenBalance = () => {
+const useTokenBalance = (event: number) => {
     const { address } = useWeb3ModalAccount()
     const [balance, setBalance] = useState<null | string>(null);
 
@@ -15,7 +15,7 @@ const useTokenBalance = () => {
             setBalance(response.toString())
         })()
 
-    }, [address])
+    }, [address, event])
 
     return balance;
 }

@@ -7,7 +7,7 @@ import multicallAbi from '../constants/multicall.json'
 import { Pool } from "../interfaces/Pool";
 import { useWeb3ModalAccount } from "@web3modal/ethers/react";
 
-const useGetPools = () => {
+const useGetPools = (event: number) => {
     const [pools, setPools] = useState<Pool[]>([]);
     const { address } = useWeb3ModalAccount()
 
@@ -78,7 +78,7 @@ const useGetPools = () => {
         })()
 
 
-    }, [address])
+    }, [address, event])
     return pools;
 }
 

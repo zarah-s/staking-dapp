@@ -6,14 +6,18 @@ import Pool from "./components/Pool";
 import { Controller } from "./controllers/Controller";
 import useGetPools from "./hooks/useGetPools";
 import ApproveDialog from "./components/ApproveDialog";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { toast } from "react-toastify";
 import InputDialog from "./components/InputDialog";
 import useTokenBalance from "./hooks/useTokenBalance";
 import { ethers } from "ethers";
+import useEvents from "./hooks/useEvents";
 
 const App = () => {
-  const tokenBalance = useTokenBalance();
+  const [stakingEventCount, tokenEventCount] = useEvents();
+
+  const pools = useGetPools(stakingEventCount);
+  const tokenBalance = useTokenBalance(tokenEventCount);
   const [poolId, setPoolId] = useState<number | null>(null);
   const [openApprovalModal, setOpenApprovalModal] = useState<boolean>(false);
   const [openInputDialog, setOpenInputDialog] = useState<boolean>(false);
@@ -21,7 +25,6 @@ const App = () => {
     title: string;
     description: string;
   } | null>(null);
-  const pools = useGetPools();
   const [approveValue, setApproveValue] = useState<string | null>(null);
   const { chainId } = useWeb3ModalAccount();
   const { walletProvider } = useWeb3ModalProvider();
