@@ -1,8 +1,97 @@
+import {
+  useWeb3ModalAccount,
+  useWeb3ModalProvider,
+} from "@web3modal/ethers/react";
 import Pool from "./components/Pool";
+import { Controller } from "./controllers/Controller";
+import useGetPools from "./hooks/useGetPools";
+import ApproveDialog from "./components/ApproveDialog";
+import { useRef, useState } from "react";
+import { toast } from "react-toastify";
+import InputDialog from "./components/InputDialog";
 
 const App = () => {
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [poolId, setPoolId] = useState<number | null>(null);
+  const [openApprovalModal, setOpenApprovalModal] = useState<boolean>(false);
+  const [openInputDialog, setOpenInputDialog] = useState<boolean>(false);
+  const [inputModalDetails, setInputModalDetails] = useState<{
+    title: string;
+    description: string;
+  } | null>(null);
+  const pools = useGetPools();
+  const [approveValue, setApproveValue] = useState<string | null>(null);
+  const { chainId } = useWeb3ModalAccount();
+  const { walletProvider } = useWeb3ModalProvider();
+  const controller = new Controller(chainId, walletProvider);
+  const [rewardRate, setRewardRate] = useState<string | null>(null);
+  const [
+    functionExecutionType,
+    setFunctionExecutionType,
+  ] = useState<FunctionType | null>(null);
   return (
     <div className="min-h-screen h-full">
+      <ApproveDialog
+        onConfirm={async () => {
+          if (!approveValue)
+            return toast.error(
+              "ERROR OCCURED: could not determine approve value"
+            );
+
+          await controller.approve(approveValue);
+          setApproveValue(null);
+          if (functionExecutionType !== null) {
+            if (functionExecutionType === FunctionType.CreatePool) {
+              await controller.createPool(
+                inputRef.current?.value.trim() ?? rewardRate ?? "0"
+              );
+            } else {
+              await controller.stake(
+                inputRef.current?.value.trim() ?? rewardRate ?? "0",
+                poolId
+              );
+              /// handle stake func
+            }
+            setRewardRate(null);
+            setFunctionExecutionType(null);
+          }
+        }}
+        onChange={() => {
+          setOpenApprovalModal(false);
+          setApproveValue(null);
+        }}
+        open={openApprovalModal}
+      />
+
+      <InputDialog
+        title={inputModalDetails?.title ?? ""}
+        description={inputModalDetails?.description ?? ""}
+        inputRef={inputRef}
+        onChange={() => {
+          setOpenInputDialog(false);
+        }}
+        onConfirm={async () => {
+          setRewardRate(inputRef.current?.value ?? "0");
+          const success =
+            functionExecutionType === FunctionType.Stake
+              ? await controller.stake(
+                  inputRef.current?.value.trim() ?? rewardRate ?? "0",
+                  poolId
+                )
+              : await controller.createPool(
+                  inputRef.current?.value.trim() ?? rewardRate ?? "0"
+                );
+          if (!success) {
+            if (functionExecutionType === FunctionType.Stake) {
+              setApproveValue(inputRef.current?.value.trim() ?? rewardRate);
+            } else {
+              setApproveValue("100");
+            }
+            setOpenApprovalModal(true);
+          }
+        }}
+        open={openInputDialog}
+      />
       <nav className="py-3 shadow shadow-[rgba(255,255,255,.1)]">
         <div className="flex items-center justify-between container">
           <h1 className="text-white madimi-one-regular text-3xl">STAKE</h1>
@@ -13,21 +102,41 @@ const App = () => {
       <div className="container mt-24">
         <div className="flex items-center mb-8 justify-between">
           <h1 className="text-white text-xl font-[600]">POOLS</h1>
-          <button className="bg-blue-600 rounded py-3 text-sm text-white font-[600] px-7">
+          <button
+            onClick={async () => {
+              setInputModalDetails({
+                title: "Reward Rate",
+                description: "Set reward rate",
+              });
+              setFunctionExecutionType(FunctionType.CreatePool);
+              setOpenInputDialog(true);
+            }}
+            className="bg-blue-600 rounded py-3 text-sm text-white font-[600] px-7"
+          >
             Create Pool
           </button>
         </div>
         <div className="flex flex-col m-auto p-auto">
           <div className="flex overflow-x-scroll pb-10 hide-scroll-bar">
             <div className="flex flex-nowrap">
-              <Pool />
-              <Pool />
-              <Pool />
-              <Pool />
-              <Pool />
-              <Pool />
-              <Pool />
-              <Pool />
+              {pools.map((pool, index) => {
+                return (
+                  <Pool
+                    onStake={() => {
+                      setPoolId(index);
+                      setInputModalDetails({
+                        title: "Stake Amount",
+                        description: "Set stake amount",
+                      });
+                      setFunctionExecutionType(FunctionType.Stake);
+                      setOpenInputDialog(true);
+                    }}
+                    id={index}
+                    pool={pool}
+                    key={index}
+                  />
+                );
+              })}
             </div>
           </div>
         </div>
@@ -37,3 +146,8 @@ const App = () => {
 };
 
 export default App;
+
+enum FunctionType {
+  CreatePool,
+  Stake,
+}
