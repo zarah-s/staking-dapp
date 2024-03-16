@@ -1,19 +1,18 @@
-import { Button, Dialog, Flex, Text, TextField } from "@radix-ui/themes";
-import { LegacyRef } from "react";
+import { Button, Dialog, Flex, TextField } from "@radix-ui/themes";
 interface Props {
   open: boolean;
-  inputRef: LegacyRef<HTMLInputElement>;
   title: string;
   description: string;
   onChange: () => void;
   onConfirm: () => void;
+  onChangeInput: (value: string) => void;
 }
 const InputDialog = ({
   onChange,
   open,
   onConfirm,
-  inputRef,
   title,
+  onChangeInput,
   description,
 }: Props) => {
   return (
@@ -29,8 +28,7 @@ const InputDialog = ({
         <Flex direction="column" gap="3">
           <label>
             <TextField.Input
-              ref={inputRef}
-              className="placeholder:text-red-500"
+              onChange={(e) => onChangeInput(e?.target?.value.trim())}
               placeholder="pool reward rate"
               style={{
                 border: "1px solid rgba(255,255,255,.5)",

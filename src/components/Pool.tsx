@@ -1,3 +1,4 @@
+import { ethers } from "ethers";
 import { Pool as IPool } from "../interfaces/Pool";
 import PoolDetail from "./PoolDetail";
 interface Props {
@@ -13,10 +14,29 @@ const Pool = ({ id, pool, onStake, onClaim, unStake }: Props) => {
       <div className="w-80 h- max-w-xs p-5 overflow-hidden text-[#ccc] rounded-lg bg-[#2D2C43] duration-300 ease-in-out">
         <h3 className="text-center text-xl font-[500]">Pool #{id}</h3>
         <div className="space-y-3 mt-5">
-          <PoolDetail label="Total Stakers" value={pool.totalStakers} />
-          <PoolDetail label="Total Staked" value={pool.totalStaked} />
-          <PoolDetail label="Reward Reserve" value={pool.rewardReserve} />
-          <PoolDetail label="Reward Rate" value={pool.rewardRate} />
+          <PoolDetail
+            label="Total Stakers"
+            value={pool.totalStakers.toString()}
+          />
+          <PoolDetail
+            label="Total Staked"
+            value={Number(
+              ethers.formatUnits(pool.totalStaked.toString(), 18)
+            ).toLocaleString()}
+          />
+          <PoolDetail
+            label="Reward Reserve"
+            value={Number(
+              ethers.formatUnits(pool.rewardReserve.toString(), 18)
+            ).toLocaleString()}
+          />
+          <PoolDetail label="Reward Rate" value={pool.rewardRate.toString()} />
+          <PoolDetail
+            label="My Stake"
+            value={ethers
+              .formatUnits(pool.stakeBalance.toString(), 18)
+              .toString()}
+          />
         </div>
         <div className="flex justify-between items-center gap-3 mt-10 ">
           <button

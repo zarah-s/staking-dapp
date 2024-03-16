@@ -26,6 +26,15 @@ const useGetPools = () => {
                 })
 
             }
+
+            for (let i = 0; i < _poolCount; i++) {
+                calls.push({
+                    target: import.meta.env.VITE_contract_address,
+                    callData: itf.encodeFunctionData("getUserStakeBalance", [i, address]),
+                })
+
+            }
+
             const multicall = new ethers.Contract(
                 import.meta.env.VITE_multicall_address,
                 multicallAbi,
@@ -35,15 +44,33 @@ const useGetPools = () => {
                 false,
                 calls
             );
-            const response = callResults.map((res: any) => (itf.decodeFunctionResult("getPoolByID", res[1])));
+            let poolResponse = []
+            let stakeBalanceResponse = [];
+
+            for (let i = 0; i < callResults.length / 2; i++) {
+                // const element = array[i];
+                poolResponse.push(itf.decodeFunctionResult("getPoolByID", callResults[i][1]))
+
+            }
+
+            for (let i = callResults.length / 2; i < callResults.length; i++) {
+                // const element = array[i];
+                stakeBalanceResponse.push(itf.decodeFunctionResult("getUserStakeBalance", callResults[i][1]))
+
+            }
+
+            console.log(stakeBalanceResponse);
+
+            // const response = callResults.map((res: any) => (itf.decodeFunctionResult("getPoolByID", res[1])));
             let _pools: Pool[] = [];
-            for (let i = 0; i < response.length; i++) {
-                const obj = response[i][0];
+            for (let i = 0; i < poolResponse.length; i++) {
+                const obj = poolResponse[i][0];
                 _pools.push({
                     totalStakers: Number(obj.totalStakers.toString()),
                     rewardRate: Number(obj.rewardRate.toString()),
                     rewardReserve: Number(obj.rewardReserve.toString()),
-                    totalStaked: Number(obj.totalStaked.toString())
+                    totalStaked: Number(obj.totalStaked.toString()),
+                    stakeBalance: Number(stakeBalanceResponse[i])
                 })
 
             }

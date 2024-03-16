@@ -14,7 +14,6 @@ import { ethers } from "ethers";
 
 const App = () => {
   const tokenBalance = useTokenBalance();
-  const inputRef = useRef<HTMLInputElement>(null);
   const [poolId, setPoolId] = useState<number | null>(null);
   const [openApprovalModal, setOpenApprovalModal] = useState<boolean>(false);
   const [openInputDialog, setOpenInputDialog] = useState<boolean>(false);
@@ -45,14 +44,9 @@ const App = () => {
           setApproveValue(null);
           if (functionExecutionType !== null) {
             if (functionExecutionType === FunctionType.CreatePool) {
-              await controller.createPool(
-                inputRef.current?.value.trim() ?? rewardRate ?? "0"
-              );
+              await controller.createPool(rewardRate ?? "0");
             } else {
-              await controller.stake(
-                inputRef.current?.value.trim() ?? rewardRate ?? "0",
-                poolId
-              );
+              await controller.stake(rewardRate ?? "0", poolId);
               /// handle stake func
             }
             setRewardRate(null);
@@ -67,26 +61,20 @@ const App = () => {
       />
 
       <InputDialog
+        onChangeInput={(val: string) => setRewardRate(val)}
         title={inputModalDetails?.title ?? ""}
         description={inputModalDetails?.description ?? ""}
-        inputRef={inputRef}
         onChange={() => {
           setOpenInputDialog(false);
         }}
         onConfirm={async () => {
-          setRewardRate(inputRef.current?.value ?? "0");
           const success =
             functionExecutionType === FunctionType.Stake
-              ? await controller.stake(
-                  inputRef.current?.value.trim() ?? rewardRate ?? "0",
-                  poolId
-                )
-              : await controller.createPool(
-                  inputRef.current?.value.trim() ?? rewardRate ?? "0"
-                );
+              ? await controller.stake(rewardRate ?? "0", poolId)
+              : await controller.createPool(rewardRate ?? "0");
           if (!success) {
             if (functionExecutionType === FunctionType.Stake) {
-              setApproveValue(inputRef.current?.value.trim() ?? rewardRate);
+              setApproveValue(rewardRate);
             } else {
               setApproveValue("100");
             }
@@ -109,7 +97,7 @@ const App = () => {
             &nbsp; &nbsp;
             {tokenBalance === null
               ? "loading"
-              : ethers.formatUnits(tokenBalance, 18).toString()}
+              : Number(ethers.formatUnits(tokenBalance, 18)).toLocaleString()}
           </span>
         </div>
         <div className="flex items-center mb-8 justify-between">

@@ -46,7 +46,7 @@ export class Controller {
             return true;
         } catch (error) {
             toast.dismiss(toastId)
-            toast.error((error as any)?.reason ?? "Andd unknown error occured", { autoClose: 5000 })
+            toast.error((error as any)?.reason ?? "An unknown error occured", { autoClose: 5000 })
             this.loading = false;
             return false;
         }
@@ -82,7 +82,7 @@ export class Controller {
             return true;
         } catch (error) {
             toast.dismiss(toastId)
-            toast.error((error as any)?.reason ?? "Andd unknown error occured", { autoClose: 5000 })
+            toast.error((error as any)?.reason ?? "An unknown error occured", { autoClose: 5000 })
             this.loading = false;
             return false;
         }
@@ -117,7 +117,7 @@ export class Controller {
             return true;
         } catch (error) {
             toast.dismiss(toastId)
-            toast.error((error as any)?.reason ?? "Andd unknown error occured", { autoClose: 5000 })
+            toast.error((error as any)?.reason ?? "An unknown error occured", { autoClose: 5000 })
             this.loading = false;
             return false;
         }
@@ -152,7 +152,7 @@ export class Controller {
             return true;
         } catch (error) {
             toast.dismiss(toastId)
-            toast.error((error as any)?.reason ?? "Andd unknown error occured", { autoClose: 5000 })
+            toast.error((error as any)?.reason ?? "An unknown error occured", { autoClose: 5000 })
             this.loading = false;
             return false;
         }
