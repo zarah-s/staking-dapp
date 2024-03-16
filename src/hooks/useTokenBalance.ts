@@ -9,6 +9,7 @@ const useTokenBalance = (event: number) => {
 
     useEffect(() => {
         (async () => {
+            if (!address) return;
             const contract = getTokenContract(readOnlyProvider);
 
             const response = await contract.balanceOf(address)

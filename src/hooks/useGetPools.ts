@@ -19,6 +19,7 @@ const useGetPools = (event: number) => {
             const data = await contract.id();
             const _poolCount = Number(data.toString());
             let calls = [];
+            if (!address) return;
             for (let i = 0; i < _poolCount; i++) {
                 calls.push({
                     target: import.meta.env.VITE_contract_address,
@@ -40,6 +41,7 @@ const useGetPools = (event: number) => {
                 multicallAbi,
                 readOnlyProvider
             );
+
             const callResults = await multicall.tryAggregate.staticCall(
                 false,
                 calls
@@ -59,7 +61,6 @@ const useGetPools = (event: number) => {
 
             }
 
-            console.log(stakeBalanceResponse);
 
             // const response = callResults.map((res: any) => (itf.decodeFunctionResult("getPoolByID", res[1])));
             let _pools: Pool[] = [];
