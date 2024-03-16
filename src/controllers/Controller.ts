@@ -37,16 +37,16 @@ export class Controller {
 
             toast.dismiss(toastId)
             if (receipt.status) {
-                toast.success("pool creation successfull!", { autoClose: 3000 })
+                toast.success("pool creation successfull!", { autoClose: 5000 })
                 this.loading = false;
                 return true;
             }
-            toast.error("pool creation failed!", { autoClose: 3000 })
+            toast.error("pool creation failed!", { autoClose: 5000 })
             this.loading = false;
             return true;
         } catch (error) {
             toast.dismiss(toastId)
-            toast.error((error as any)?.reason ?? "Andd unknown error occured", { autoClose: 3000 })
+            toast.error((error as any)?.reason ?? "Andd unknown error occured", { autoClose: 5000 })
             this.loading = false;
             return false;
         }
@@ -73,16 +73,86 @@ export class Controller {
 
             toast.dismiss(toastId)
             if (receipt.status) {
-                toast.success("stake successfull!", { autoClose: 3000 })
+                toast.success("stake successfull!", { autoClose: 5000 })
                 this.loading = false;
                 return true;
             }
-            toast.error("stake failed!", { autoClose: 3000 })
+            toast.error("stake failed!", { autoClose: 5000 })
             this.loading = false;
             return true;
         } catch (error) {
             toast.dismiss(toastId)
-            toast.error((error as any)?.reason ?? "Andd unknown error occured", { autoClose: 3000 })
+            toast.error((error as any)?.reason ?? "Andd unknown error occured", { autoClose: 5000 })
+            this.loading = false;
+            return false;
+        }
+    };
+
+
+    claimReward = async (poolId: number | null) => {
+        if (this.loading) return;
+        if (poolId === null) return toast.error("Invalid pool Id")
+        if (!this.chainId) return toast.error("Connect wallet")
+        if (!isSupportedChain(this.chainId!)) return toast.error("Wrong network");
+        this.loading = true;
+        const toastId = toast.loading("Processing");
+        const readWriteProvider = getProvider(this.walletProvider!);
+        const signer = await readWriteProvider.getSigner();
+        const contract = getStakingContract(signer);
+        try {
+            const transaction = await contract.claimReward(poolId);
+            console.log("transaction: ", transaction);
+            const receipt = await transaction.wait();
+
+            console.log("receipt: ", receipt);
+
+            toast.dismiss(toastId)
+            if (receipt.status) {
+                toast.success("claim successfull!", { autoClose: 5000 })
+                this.loading = false;
+                return true;
+            }
+            toast.error("claim failed!", { autoClose: 5000 })
+            this.loading = false;
+            return true;
+        } catch (error) {
+            toast.dismiss(toastId)
+            toast.error((error as any)?.reason ?? "Andd unknown error occured", { autoClose: 5000 })
+            this.loading = false;
+            return false;
+        }
+    };
+
+
+    unstake = async (poolId: number | null) => {
+        if (this.loading) return;
+        if (poolId === null) return toast.error("Invalid pool Id")
+        if (!this.chainId) return toast.error("Connect wallet")
+        if (!isSupportedChain(this.chainId!)) return toast.error("Wrong network");
+        this.loading = true;
+        const toastId = toast.loading("Processing");
+        const readWriteProvider = getProvider(this.walletProvider!);
+        const signer = await readWriteProvider.getSigner();
+        const contract = getStakingContract(signer);
+        try {
+            const transaction = await contract.unstake(poolId);
+            console.log("transaction: ", transaction);
+            const receipt = await transaction.wait();
+
+            console.log("receipt: ", receipt);
+
+            toast.dismiss(toastId)
+            if (receipt.status) {
+                toast.success("unstake successfull!", { autoClose: 5000 })
+                this.loading = false;
+                return true;
+            }
+            toast.error("unstake failed!", { autoClose: 5000 })
+            this.loading = false;
+            return true;
+        } catch (error) {
+            toast.dismiss(toastId)
+            toast.error((error as any)?.reason ?? "Andd unknown error occured", { autoClose: 5000 })
             this.loading = false;
             return false;
         }
@@ -107,15 +177,15 @@ export class Controller {
 
             toast.dismiss(toastId)
             if (receipt.status) {
-                toast.success("approve successfull!", { autoClose: 3000 })
+                toast.success("approve successfull!", { autoClose: 5000 })
                 this.loading = false;
                 return;
             }
-            toast.error("approve failed!", { autoClose: 3000 })
+            toast.error("approve failed!", { autoClose: 5000 })
             this.loading = false;
         } catch (error) {
             toast.dismiss(toastId)
-            toast.error((error as any)?.reason ?? "An unknown error occured", { autoClose: 3000 })
+            toast.error((error as any)?.reason ?? "An unknown error occured", { autoClose: 5000 })
             this.loading = false;
         }
     };
@@ -136,15 +206,15 @@ export class Controller {
     //         console.log("receipt: ", receipt);
     //         toast.dismiss(toastId)
     //         if (receipt.status) {
-    //             toast.success("vote successfull!", { autoClose: 3000 })
+    //             toast.success("vote successfull!", { autoClose: 5000 })
     //             this.loading = false;
     //             return;
     //         }
-    //         toast.error("vote failed!", { autoClose: 3000 })
+    //         toast.error("vote failed!", { autoClose: 5000 })
     //         this.loading = false;
     //     } catch (error) {
     //         toast.dismiss(toastId)
-    //         toast.error(error?.reason ?? "An unknown error occured", { autoClose: 3000 })
+    //         toast.error(error?.reason ?? "An unknown error occured", { autoClose: 5000 })
     //         this.loading = false;
     //     }
     // };

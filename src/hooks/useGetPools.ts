@@ -5,9 +5,11 @@ import { ethers } from "ethers";
 import Abi from "../constants/stakingAbi.json"
 import multicallAbi from '../constants/multicall.json'
 import { Pool } from "../interfaces/Pool";
+import { useWeb3ModalAccount } from "@web3modal/ethers/react";
 
 const useGetPools = () => {
     const [pools, setPools] = useState<Pool[]>([]);
+    const { address } = useWeb3ModalAccount()
 
 
     useEffect(() => {
@@ -49,8 +51,7 @@ const useGetPools = () => {
         })()
 
 
-    }, [])
-    console.log(pools)
+    }, [address])
     return pools;
 }
 

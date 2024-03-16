@@ -9,8 +9,11 @@ import ApproveDialog from "./components/ApproveDialog";
 import { useRef, useState } from "react";
 import { toast } from "react-toastify";
 import InputDialog from "./components/InputDialog";
+import useTokenBalance from "./hooks/useTokenBalance";
+import { ethers } from "ethers";
 
 const App = () => {
+  const tokenBalance = useTokenBalance();
   const inputRef = useRef<HTMLInputElement>(null);
   const [poolId, setPoolId] = useState<number | null>(null);
   const [openApprovalModal, setOpenApprovalModal] = useState<boolean>(false);
@@ -99,7 +102,16 @@ const App = () => {
         </div>
       </nav>
 
-      <div className="container mt-24">
+      <div className="container  mt-20">
+        <div className="flex items-center mb-5 justify-end">
+          <span className="text-white font-[600] text-xl">Token Balance:</span>
+          <span className="text-[#ccc]">
+            &nbsp; &nbsp;
+            {tokenBalance === null
+              ? "loading"
+              : ethers.formatUnits(tokenBalance, 18).toString()}
+          </span>
+        </div>
         <div className="flex items-center mb-8 justify-between">
           <h1 className="text-white text-xl font-[600]">POOLS</h1>
           <button
@@ -122,6 +134,12 @@ const App = () => {
               {pools.map((pool, index) => {
                 return (
                   <Pool
+                    unStake={async () => {
+                      await controller.unstake(index);
+                    }}
+                    onClaim={async () => {
+                      await controller.claimReward(index);
+                    }}
                     onStake={() => {
                       setPoolId(index);
                       setInputModalDetails({

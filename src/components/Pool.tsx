@@ -4,8 +4,10 @@ interface Props {
   pool: IPool;
   id: number;
   onStake: () => void;
+  onClaim: () => void;
+  unStake: () => void;
 }
-const Pool = ({ id, pool, onStake }: Props) => {
+const Pool = ({ id, pool, onStake, onClaim, unStake }: Props) => {
   return (
     <div className="inline-block px-3">
       <div className="w-80 h- max-w-xs p-5 overflow-hidden text-[#ccc] rounded-lg bg-[#2D2C43] duration-300 ease-in-out">
@@ -16,15 +18,24 @@ const Pool = ({ id, pool, onStake }: Props) => {
           <PoolDetail label="Reward Reserve" value={pool.rewardReserve} />
           <PoolDetail label="Reward Rate" value={pool.rewardRate} />
         </div>
-        <div className="flex items-center gap-3 mt-10 justify-end ">
+        <div className="flex justify-between items-center gap-3 mt-10 ">
           <button
             onClick={onStake}
-            className="bg-blue-600 rounded py-1 text-sm text-white font-[600] px-5"
+            className="bg-blue-600 rounded py-1 text-sm text-white font-[600] px-3"
           >
             Stake
           </button>
-          <button className="bg-blue-600 rounded py-1 text-sm text-white font-[600] px-5">
+          <button
+            onClick={onClaim}
+            className="bg-blue-600 rounded py-1 text-sm text-white font-[600] px-3"
+          >
             Claim Reward
+          </button>
+          <button
+            onClick={unStake}
+            className="bg-blue-600 rounded py-1 text-sm text-white font-[600] px-3"
+          >
+            Unstake
           </button>
         </div>
       </div>
